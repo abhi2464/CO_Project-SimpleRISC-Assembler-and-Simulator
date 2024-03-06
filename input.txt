@@ -1,1 +1,2 @@
-add rs3, rs1, rs2
+add x3, x2, x1
+slt x31, x3, x1
