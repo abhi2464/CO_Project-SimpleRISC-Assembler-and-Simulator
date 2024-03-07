@@ -80,3 +80,4 @@ for x in data:
         #we have to write the opcode at the least significant bit
         f = f"{opcode}{destbin}{funct3}{s1bin}{s2bin}{funct7}\n"
         file.writelines(f)
+        
