@@ -9,7 +9,7 @@ jtype={
     'opcode':'1101111'
     
 }
-register = {
+registers = {
     "x0": {"address": "00000", "value": 0},
     "x1": {"address": "00001", "value": 0},
     "x2": {"address": "00010", "value": 0},
@@ -43,6 +43,20 @@ register = {
     "x30": {"address": "11110", "value": 0},
     "x31": {"address": "11111", "value": 0},
 }
+def getFunction(funct):
+    if funct in list(rtype["funct3"].keys()):
+        return rtype["funct3"][funct]
+    elif funct in list(rtype["funct7"].keys()):
+        return rtype["funct7"][funct]
+    
+    exit()
+
+def getregisters(reg):
+    try:
+        return registers[reg]
+    except:
+        exit("Register Not Found")
+
 
 with open('input.txt', 'r') as file:
     data = file.readlines()
@@ -52,32 +66,30 @@ with open("output.txt", 'w') as file:
     
 for x in data:
     command = x.split(",")[0].split(" ")[0].strip()
-    dest = x.split(",")[0].split(" ")[1].strip()
-    s1 = x.split(",")[1].strip()
-    s2 = x.split(",")[2].strip()
+
     if (command in rtype['funct3']):
+        dest = getregisters(x.split(",")[0].split(" ")[1].strip())
+        s1 = getregisters(x.split(",")[1].strip())
+        s2 = getregisters(x.split(",")[2].strip())
         opcode = rtype['opcode']
-        destbin = register[dest]['address']
+        destbin = dest['address']
         funct3 = rtype['funct3'][command]
-        s1bin = register[s1]['address']
-        s2bin = register[s2]['address']
+        s1bin = s1['address']
+        s2bin = s2['address']
         funct7 = rtype['funct7'][command]
-        print(opcode,destbin,funct3,s1bin,s2bin,funct7)
-    
-    if command=='jal':
+        with open("output.txt", 'a') as file:
+            f = f"{funct7}{s2bin}{s1bin}{funct3}{destbin}{opcode}\n"
+            file.writelines(f)
+        
+    elif command=='jal':
         opcode=jtype['opcode']
         temp=re.split(r"[, ]+",x)
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(20)] ) )
-        reg=register[temp[1]]['address']
+        reg=registers[temp[1]]['address']
         imm=bin(int(temp[2]))
         print(imm[19]+imm[9:0:-1]+imm[10]+imm[18:11:-1]+reg+opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[19]}{imm[9:0:-1]}{imm[10]}{imm[18:11:-1]}{reg}{opcode}\n"
             file.writelines(f)
         
-    with open("output.txt", 'a') as file:
-        #Aaman please reverse this encoding as it is mentioned in the table that 
-        #we have to write the opcode at the least significant bit
-        f = f"{opcode}{destbin}{funct3}{s1bin}{s2bin}{funct7}\n"
-        file.writelines(f)
         
