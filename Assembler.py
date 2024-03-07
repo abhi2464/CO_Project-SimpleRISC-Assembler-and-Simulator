@@ -1,9 +1,14 @@
+import re
 rtype = {
     'opcode':'0110011',
     'funct3':{'add':'000','sub':'000', 'sll':'001', 'slt':'010', 'sltu':'011', 'xor':'100', 'srl':'101','or':'110','and':'111'},
     'funct7':{'add':'0000000','sub':'0100000', 'sll':'0000000', 'slt':'0000000', 'sltu':'0000000', 'xor':'0000000', 'srl':'0000000','or':'0000000','and':'0000000'}
 }
 
+jtype={
+    'opcode':'1101111'
+    
+}
 register = {
     "x0": {"address": "00000", "value": 0},
     "x1": {"address": "00001", "value": 0},
@@ -57,11 +62,21 @@ for x in data:
         s1bin = register[s1]['address']
         s2bin = register[s2]['address']
         funct7 = rtype['funct7'][command]
-    print(opcode,destbin,funct3,s1bin,s2bin,funct7)
-
-
+        print(opcode,destbin,funct3,s1bin,s2bin,funct7)
+    
+    if command=='jal':
+        opcode=jtype['opcode']
+        temp=re.split(r"[, ]+",x)
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(20)] ) )
+        reg=register[temp[1]]['address']
+        imm=bin(int(temp[2]))
+        print(imm[19]+imm[9:0:-1]+imm[10]+imm[18:11:-1]+reg+opcode)
+        with open("output.txt", 'a') as file:
+            f = f"{imm[19]}{imm[9:0:-1]}{imm[10]}{imm[18:11:-1]}{reg}{opcode}\n"
+            file.writelines(f)
         
     with open("output.txt", 'a') as file:
-    
+        #Aaman please reverse this encoding as it is mentioned in the table that 
+        #we have to write the opcode at the least significant bit
         f = f"{opcode}{destbin}{funct3}{s1bin}{s2bin}{funct7}\n"
         file.writelines(f)
