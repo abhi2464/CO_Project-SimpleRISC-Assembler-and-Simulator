@@ -4,4 +4,5 @@ add x3, x2, x1
 slt x31, x3, x1
 jal x15,899306
 sw x1,345,x2
+auipc x5,-30
 rst

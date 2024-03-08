@@ -21,6 +21,11 @@ stype = {
     'funct3':{'sw':'010'}
 }
 
+utype ={
+    'opcode':{'lui':'0110111','auipc':'0010111'},
+    'funct3':{'lui','auipc'}
+}
+
 registers = {
     "x0": {"address": "00000", "value": ""},
     "x1": {"address": "00001", "value": ""},
@@ -72,7 +77,7 @@ with open("output.txt", 'w') as file:
 
 for x in data:
 
-    temp=re.split(r"[, ]+",x)
+    temp=re.split(r"[, \n]+",x)
     command = temp[0].strip()
     if (command in rtype['funct3']):
         PC += 1
@@ -109,10 +114,24 @@ for x in data:
         with open("output.txt", 'a') as file:
             f = f"{imm[len(imm)-1-11:len(imm)-5]}{dest}{s1}{funct3}{imm[len(imm)-1-4:len(imm)]}{opcode}\n"
             file.writelines(f)
+
+    elif (command in utype['funct3']):
+        print(temp)
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+        opcode = utype['opcode'][command]
+        dest= getregisters(temp[1].strip())['address']
+        imm= bin(int(temp[2]))
+        # print(imm[0:len(imm)-12],dest,opcode)
+        with open("output.txt", 'a') as file:
+            f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
+            file.writelines(f)
+    
     elif command == "halt":
         PC += 1
         
         exit("Halted")
+    
+
     elif command == "rvrs":
         PC += 1
         rs = getregisters(temp[2].strip())   
@@ -120,7 +139,9 @@ for x in data:
         rd["value"] = (rs["value"])[::-1]
         with open("output.txt", 'a') as file:
             f = f"0000000{rd['address']}000{rs['address']}000000000000\n"
-            file.writelines(f)    
+            file.writelines(f)
+
+        
     elif command == "rst":
         PC += 1
         for r in registers:
