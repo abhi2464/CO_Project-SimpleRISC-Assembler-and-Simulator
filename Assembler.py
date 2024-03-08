@@ -11,7 +11,7 @@ jtype={
 }
 
 itype = {
-    'opcode':{'lw':['0000011'],'addi':['0010011'],'sltiu':['0010011'],'jalr':['1100011']},
+    'opcode':{'lw':['0000011'],'addi':['0010011'],'sltiu':['0010011'],'jalr':['1100111']},
     'funct3' : {'lw':'010' , 'addi':'000' , 'sltiu':'011' , 'jalr':'000'}
 }
 itype_command = ['lw','addi','sltiu','jalr']
@@ -76,7 +76,6 @@ with open("output.txt", 'w') as file:
     file.writelines("")
 
 for x in data:
-
     temp=re.split(r"[, \n]+",x)
     command = temp[0].strip()
     if (command in rtype['funct3']):
@@ -116,7 +115,7 @@ for x in data:
             file.writelines(f)
 
     elif (command in utype['funct3']):
-        print(temp)
+        PC+=1
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
         opcode = utype['opcode'][command]
         dest= getregisters(temp[1].strip())['address']
@@ -126,6 +125,20 @@ for x in data:
             f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
             file.writelines(f)
     
+    elif command in itype_command:
+        PC+=1
+        opcode=itype['opcode'][command][0]
+        temp=re.split(r"[, ]+",x)
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(12)] ) )
+        imm=bin(int(temp[3]))
+        s1 = getregisters(temp[1].strip())['address']
+        s2 = getregisters(temp[2].strip())['address']
+        funct3 = itype['funct3'][command]
+        # print(imm,s1,funct3,s2,opcode)
+        with open("output.txt", 'a') as file:
+            f = f"{imm}{s1}{funct3}{s2}{opcode}\n"
+            file.writelines(f)
+
     elif command == "halt":
         PC += 1
         
