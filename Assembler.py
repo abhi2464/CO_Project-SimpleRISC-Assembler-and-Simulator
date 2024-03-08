@@ -9,6 +9,18 @@ jtype={
     'opcode':'1101111'
     
 }
+
+itype = {
+    'opcode':{'lw':['0000011'],'addi':['0010011'],'sltiu':['0010011'],'jalr':['1100011']},
+    'funct3' : {'lw':'010' , 'addi':'000' , 'sltiu':'011' , 'jalr':'000'}
+}
+itype_command = ['lw','addi','sltiu','jalr']
+
+stype = {
+    'opcode':'0100011',
+    'funct3':{'sw':'010'}
+}
+
 registers = {
     "x0": {"address": "00000", "value": 0},
     "x1": {"address": "00001", "value": 0},
@@ -47,7 +59,7 @@ registers = {
 
 def getregisters(reg):
     try:
-        return registers[reg]
+        return registers[reg]["address"]
     except:
         exit("Register Not Found")
 
@@ -66,24 +78,32 @@ for x in data:
         s1 = getregisters(temp[2].strip())
         s2 = getregisters(temp[3].strip())
         opcode = rtype['opcode']
-        destbin = dest['address']
         funct3 = rtype['funct3'][command]
-        s1bin = s1['address']
-        s2bin = s2['address']
         funct7 = rtype['funct7'][command]
         with open("output.txt", 'a') as file:
-            f = f"{funct7}{s2bin}{s1bin}{funct3}{destbin}{opcode}\n"
+            f = f"{funct7}{s2}{s1}{funct3}{dest}{opcode}\n"
             file.writelines(f)
         
     elif command=='jal':
         opcode=jtype['opcode']
-        temp=re.split(r"[, ]+",x)
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(20)] ) )
-        reg=registers[temp[1]]['address']
+        reg=getregisters(temp[1].strip())
         imm=bin(int(temp[2]))
-        print(imm[19]+imm[9::-1]+imm[10]+imm[18:11:-1]+reg+opcode)
+        # print(imm[0],imm[len(imm)-10:len(imm)],imm[len(imm)-11],imm[len(imm)-19:len(imm)-11],reg,opcode)
         with open("output.txt", 'a') as file:
-            f = f"{imm[19]}{imm[9::-1]}{imm[10]}{imm[18:11:-1]}{reg}{opcode}\n"
+            f = f"{imm[0]}{imm[len(imm)-10:len(imm)]}{imm[len(imm)-11]}{imm[len(imm)-19:len(imm)-11]}{reg}{opcode}\n"
             file.writelines(f)
-        
+    
+    elif (command in stype['funct3']):
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(12)] ) )
+        opcode = stype['opcode']
+        dest=getregisters(temp[1].strip())
+        funct3 =stype['funct3'][command]
+        imm=bin(int(temp[2]))
+        s1 = getregisters(temp[3].strip())
+        # print(imm[len(imm)-1-11:len(imm)-5],dest,s1,funct3,imm[len(imm)-1-4:len(imm)],opcode)
+        with open("output.txt", 'a') as file:
+            f = f"{imm[len(imm)-1-11:len(imm)-5]}{dest}{s1}{funct3}{imm[len(imm)-1-4:len(imm)]}{opcode}\n"
+            file.writelines(f)
+
         
