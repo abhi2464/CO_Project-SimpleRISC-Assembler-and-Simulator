@@ -43,13 +43,7 @@ registers = {
     "x30": {"address": "11110", "value": 0},
     "x31": {"address": "11111", "value": 0},
 }
-def getFunction(funct):
-    if funct in list(rtype["funct3"].keys()):
-        return rtype["funct3"][funct]
-    elif funct in list(rtype["funct7"].keys()):
-        return rtype["funct7"][funct]
-    
-    exit()
+
 
 def getregisters(reg):
     try:
@@ -65,12 +59,12 @@ with open("output.txt", 'w') as file:
     file.writelines("")
     
 for x in data:
-    command = x.split(",")[0].split(" ")[0].strip()
-
+    temp=re.split(r"[, ]+",x)
+    command = temp[0]
     if (command in rtype['funct3']):
-        dest = getregisters(x.split(",")[0].split(" ")[1].strip())
-        s1 = getregisters(x.split(",")[1].strip())
-        s2 = getregisters(x.split(",")[2].strip())
+        dest = getregisters(temp[1].strip())
+        s1 = getregisters(temp[2].strip())
+        s2 = getregisters(temp[3].strip())
         opcode = rtype['opcode']
         destbin = dest['address']
         funct3 = rtype['funct3'][command]
