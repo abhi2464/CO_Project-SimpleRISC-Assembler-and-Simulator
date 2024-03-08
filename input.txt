@@ -1,9 +1,9 @@
-mul x0,x1,x2
-rvrs x5,x3
-add x3, x2, x1
-slt x31, x3, x1
-jal x15,899306
-sw x1,345,x2
-auipc x5,-30
-jalr x5,x8,-07
-rst
+add ra,t0,gp
+sub t1,s0,a0
+sll a1,t2,t3
+slt s1,a2,s2
+sltu s3,a3,s4
+xor s5,a4,s6
+srl s7,a5,s8
+or s9,a6,s10
+and s11,a7,s0
