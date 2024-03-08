@@ -89,7 +89,7 @@ for x in data:
         imm=bin(int(temp[2]))
         print(imm[19]+imm[9:0:-1]+imm[10]+imm[18:11:-1]+reg+opcode)
         with open("output.txt", 'a') as file:
-            f = f"{imm[19]}{imm[9:0:-1]}{imm[10]}{imm[18:11:-1]}{reg}{opcode}\n"
+            f = f"{imm[19]}{imm[9::-1]}{imm[10]}{imm[18:11:-1]}{reg}{opcode}\n"
             file.writelines(f)
         
         
