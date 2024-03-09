@@ -89,6 +89,11 @@ for i in data:
     if i==[]:
         data.remove(i)
 
+# Check for Virtual Halt   
+if 'beq zero,zero,0' not in data:
+    exit('Virtual Halt Not Found In The Code')
+
+# Main Program
 for x in data:
     temp=re.split(r"[, \n]+",x)
     command = temp[0].strip()
@@ -110,12 +115,12 @@ for x in data:
     elif command=='jal':
         PC += 1
         opcode=jtype['opcode']
-        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(20)] ) )
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(21)] ) )
         reg=getregisters(temp[1].strip())["address"]
         imm=bin(int(temp[2]))
-        # print(imm[0],imm[len(imm)-10:len(imm)],imm[len(imm)-11],imm[len(imm)-19:len(imm)-11],reg,opcode)
+        # print(imm[0],imm[len(imm)-10-1:len(imm)-1],imm[len(imm)-1-11],imm[len(imm)-20:len(imm)-12],reg,opcode)
         with open("output.txt", 'a') as file:
-            f = f"{imm[0]}{imm[len(imm)-10:len(imm)]}{imm[len(imm)-11]}{imm[len(imm)-19:len(imm)-11]}{reg}{opcode}\n"
+            f = f"{imm[0]}{imm[len(imm)-10-1:len(imm)-1]}{imm[len(imm)-1-11]}{imm[len(imm)-20:len(imm)-12]}{reg}{opcode}\n"
             file.writelines(f)
     
     # S-Type Instructions

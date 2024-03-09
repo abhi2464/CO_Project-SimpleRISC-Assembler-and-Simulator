@@ -10,3 +10,5 @@ and s11,a7,s0
 jalr ra,a5,-07
 blt a4,a5,200
 bgeu s8,a6,-55
+jal ra,-1024
+beq zero,zero,0
