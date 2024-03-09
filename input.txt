@@ -11,4 +11,5 @@ jalr ra,a5,-07
 blt a4,a5,200
 bgeu s8,a6,-55
 jal ra,-1024
+sw t5,-20(s0)
 beq zero,zero,0

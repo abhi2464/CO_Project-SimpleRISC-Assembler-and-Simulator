@@ -95,7 +95,7 @@ if 'beq zero,zero,0' not in data:
 
 # Main Program
 for x in data:
-    temp=re.split(r"[, \n]+",x)
+    temp=re.split(r"[, ()\n]+",x)
     command = temp[0].strip()
     
     #R-Type Instructions
