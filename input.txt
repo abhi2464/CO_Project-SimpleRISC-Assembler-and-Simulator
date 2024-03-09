@@ -10,6 +10,5 @@ bltu a1,a7,32
 sll s7,t0,t1
 srl s1,t6,t4
 or s9,s10,t6
-lw a4,20(s1)
-jal ra,-1024
+dfaf a5,s5,45
 beq zero,zero,0

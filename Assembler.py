@@ -93,12 +93,13 @@ with open("output.txt", 'w') as file:
 
 #Removing empty lines from the program 
 for i in data:
-    if i==[]:
+    if i=='\n':
         data.remove(i)
 
 # Check for Virtual Halt   
 if 'beq zero,zero,0' not in data:
-    exit('Virtual Halt Not Found In The Code')
+    if 'beq zero,zero,0\n' not in data:
+        exit('Virtual Halt Not Found In The Code')
 
 # Main Program
 for x in data:
@@ -256,4 +257,6 @@ for x in data:
             dest["value"] = "0"*32            
         with open("output.txt", 'a') as file:
             f = f"0000000{dest['address']}000{s1['address']}{s2['address']}0000000\n"
-            file.writelines(f)        
+            file.writelines(f)
+    else:
+        exit("Instructions Not Found")        
