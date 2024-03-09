@@ -4,7 +4,9 @@ rtype = {
     'funct3':{'add':'000','sub':'000', 'sll':'001', 'slt':'010', 'sltu':'011', 'xor':'100', 'srl':'101','or':'110','and':'111'},
     'funct7':{'add':'0000000','sub':'0100000', 'sll':'0000000', 'slt':'0000000', 'sltu':'0000000', 'xor':'0000000', 'srl':'0000000','or':'0000000','and':'0000000'}
 }
-PC = 0
+
+PC = 0 #Program Counter
+
 jtype={
     'opcode':'1101111'
     
@@ -26,6 +28,12 @@ utype ={
     'funct3':{'lui','auipc'}
 }
 
+btype={
+    'opcode':'1100011',
+    'funct3':{'beq':'000','bne':'001','blt':'100','bge':'101','bltu':'110','bgeu':'111'}
+}
+
+#Register's Address
 registers = {
     "zero": {"address": "00000", "value": ""},
     "ra": {"address": "00001", "value": ""},
@@ -67,7 +75,7 @@ def getregisters(reg):
     try:
         return registers[reg]
     except:
-        exit("Register Not Found")
+        exit(f"Register Not Found At Line No. {PC}")
 
 
 with open('input.txt', 'r') as file:
@@ -76,9 +84,16 @@ with open('input.txt', 'r') as file:
 with open("output.txt", 'w') as file:
     file.writelines("")
 
+#Removing empty lines from the program 
+for i in data:
+    if i==[]:
+        data.remove(i)
+
 for x in data:
     temp=re.split(r"[, \n]+",x)
     command = temp[0].strip()
+    
+    #R-Type Instructions
     if (command in rtype['funct3']):
         PC += 1
         dest = getregisters(temp[1].strip())["address"]
@@ -90,7 +105,8 @@ for x in data:
         with open("output.txt", 'a') as file:
             f = f"{funct7}{s2}{s1}{funct3}{dest}{opcode}\n"
             file.writelines(f)
-        
+    
+    # J-Type Instructions   
     elif command=='jal':
         PC += 1
         opcode=jtype['opcode']
@@ -102,6 +118,7 @@ for x in data:
             f = f"{imm[0]}{imm[len(imm)-10:len(imm)]}{imm[len(imm)-11]}{imm[len(imm)-19:len(imm)-11]}{reg}{opcode}\n"
             file.writelines(f)
     
+    # S-Type Instructions
     elif (command in stype['funct3']):
         PC += 1
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(12)] ) )
@@ -115,6 +132,7 @@ for x in data:
             f = f"{imm[len(imm)-1-11:len(imm)-5]}{dest}{s1}{funct3}{imm[len(imm)-1-4:len(imm)]}{opcode}\n"
             file.writelines(f)
 
+    # U-Type Instructions
     elif (command in utype['funct3']):
         PC+=1
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
@@ -126,20 +144,35 @@ for x in data:
             f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
             file.writelines(f)
     
+    # I-Type Instructions
     elif command in itype_command:
         PC+=1
         opcode=itype['opcode'][command][0]
-        temp=re.split(r"[, ]+",x)
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(12)] ) )
         imm=bin(int(temp[3]))
         s1 = getregisters(temp[1].strip())['address']
         s2 = getregisters(temp[2].strip())['address']
         funct3 = itype['funct3'][command]
-        # print(imm,s1,funct3,s2,opcode)
+        # print(imm,s2,funct3,s1,opcode)
         with open("output.txt", 'a') as file:
-            f = f"{imm}{s1}{funct3}{s2}{opcode}\n"
+            f = f"{imm}{s2}{funct3}{s1}{opcode}\n"
             file.writelines(f)
 
+    # B-Type Instructions
+    elif command in btype["funct3"]:
+        PC+=1
+        opcode=btype['opcode']
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(16)] ) )
+        imm=bin(int(temp[3]))
+        s1 = getregisters(temp[1].strip())['address']
+        s2 = getregisters(temp[2].strip())['address']
+        funct3 = btype['funct3'][command]
+        # print(imm[len(imm)-1-12],imm[len(imm)-10-1:len(imm)-5],s2,s1,funct3,imm[len(imm)-5:len(imm)-1],imm[len(imm)-11-1],opcode)
+        with open("output.txt", 'a') as file:
+            f = f"{imm[len(imm)-1-12]}{imm[len(imm)-10-1:len(imm)-5]}{s2}{s1}{funct3}{imm[len(imm)-5:len(imm)-1]}{imm[len(imm)-11-1]}{opcode}\n"
+            file.writelines(f)
+
+    # Bonus Part
     elif command == "halt":
         PC += 1
         
