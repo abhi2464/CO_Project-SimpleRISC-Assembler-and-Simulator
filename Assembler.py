@@ -70,13 +70,20 @@ registers = {
     "t6": {"address": "11111", "value": ""},
 }
 
-
+# Register Check
 def getregisters(reg):
     try:
         return registers[reg]
     except:
         exit(f"Register Not Found At Line No. {PC}")
 
+# Immediate Value Check
+def immediate_value(imm,x):
+    if imm<((-2)**x) or imm>((2**x)-1):
+        exit(f"Invalid Immediate Value At Line No. {PC}")
+    else:
+        bin = lambda imm : ''.join(reversed( [str((x >> i) & 1) for i in range(x)] ) )
+        return bin(imm)
 
 with open('input.txt', 'r') as file:
     data = file.readlines()
@@ -115,9 +122,14 @@ for x in data:
     elif command=='jal':
         PC += 1
         opcode=jtype['opcode']
-        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(21)] ) )
         reg=getregisters(temp[1].strip())["address"]
-        imm=bin(int(temp[2]))
+        bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(21)] ) )
+
+        if int(temp[2])<(-2**21) or int(temp[2])>((2**21)-1):
+            exit(f"Invalid Immediate Value At Line No. {PC}")
+        else:
+            imm=bin(int(temp[2]))
+
         # print(imm[0],imm[len(imm)-10-1:len(imm)-1],imm[len(imm)-1-11],imm[len(imm)-20:len(imm)-12],reg,opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[0]}{imm[len(imm)-10-1:len(imm)-1]}{imm[len(imm)-1-11]}{imm[len(imm)-20:len(imm)-12]}{reg}{opcode}\n"
@@ -130,7 +142,12 @@ for x in data:
         opcode = stype['opcode']
         dest=getregisters(temp[1].strip())["address"]
         funct3 =stype['funct3'][command]
-        imm=bin(int(temp[2]))
+
+        if int(temp[2])<(-2**12) or int(temp[2])>((2**12)-1):
+            exit(f"Invalid Immediate Value At Line No. {PC}")
+        else:
+            imm=bin(int(temp[2]))
+
         s1 = getregisters(temp[3].strip())["address"]
         # print(imm[len(imm)-1-11:len(imm)-5],dest,s1,funct3,imm[len(imm)-1-4:len(imm)],opcode)
         with open("output.txt", 'a') as file:
@@ -143,7 +160,12 @@ for x in data:
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
         opcode = utype['opcode'][command]
         dest= getregisters(temp[1].strip())['address']
-        imm= bin(int(temp[2]))
+        
+        if (int(temp[2]))<(-2**32) or (int(temp[2]))>((2**32)-1):
+            exit(f"Invalid Immediate Value At Line No. {PC}")
+        else:
+            imm=bin(int(temp[2]))
+
         # print(imm[0:len(imm)-12],dest,opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
@@ -154,9 +176,25 @@ for x in data:
         PC+=1
         opcode=itype['opcode'][command][0]
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(12)] ) )
-        imm=bin(int(temp[3]))
-        s1 = getregisters(temp[1].strip())['address']
-        s2 = getregisters(temp[2].strip())['address']
+        if command == 'lw':
+
+            if int(temp[2])<(-2**12) or int(temp[2])>((2**12)-1):
+                exit(f"Invalid Immediate Value At Line No. {PC}")
+            else:
+                imm=bin(int(temp[2]))
+
+            s1 = getregisters(temp[1].strip())['address']
+            s2 = getregisters(temp[3].strip())['address']
+        else:
+
+            if int(temp[3])<(-2**12) or int(temp[3])>((2**12)-1):
+                exit(f"Invalid Immediate Value At Line No. {PC}")
+            else:
+                imm=bin(int(temp[3]))
+
+            s1 = getregisters(temp[1].strip())['address']
+            s2 = getregisters(temp[2].strip())['address']
+
         funct3 = itype['funct3'][command]
         # print(imm,s2,funct3,s1,opcode)
         with open("output.txt", 'a') as file:
@@ -168,7 +206,12 @@ for x in data:
         PC+=1
         opcode=btype['opcode']
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(16)] ) )
-        imm=bin(int(temp[3]))
+
+        if int(temp[3])<(-2**16) or int(temp[3])>((2**16)-1):
+            exit(f"Invalid Immediate Value At Line No. {PC}")
+        else:
+            imm=bin(int(temp[3]))
+        
         s1 = getregisters(temp[1].strip())['address']
         s2 = getregisters(temp[2].strip())['address']
         funct3 = btype['funct3'][command]
