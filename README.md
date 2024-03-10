@@ -1,7 +1,7 @@
 CO PROJECT 2024
 <br>
 
-This Repository is made by team fofr Computer Organisation Course.
+This Repository is made by team for Computer Organisation Course.
 <br>
 <br>
 
