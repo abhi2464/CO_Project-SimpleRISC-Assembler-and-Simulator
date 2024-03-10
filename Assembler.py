@@ -86,14 +86,11 @@ with open('input.txt', 'r') as file:
 with open("output.txt", 'w') as file:
     file.writelines("")
 
-# print(data)
-# print()
 for j in range(len(data)):
     if data[j].strip()=='\n':
         pass
     else:
         data[j]=data[j].strip()
-# print(data)
 
 # Label Check 
 for i in range(len(data)):
@@ -107,10 +104,6 @@ for i in range(len(data)):
                 data[i]=data[i][data[i].index(':')+2:]
             else:
                 data[i]=data[i].strip() #to remove extra spaces from the instructions
-# print(label)
-# print(label_add)
-# print(data)
-# print()
 
 
 # Check for Virtual Halt   
@@ -122,7 +115,6 @@ if 'beq zero,zero,0' not in data:
 for x in data:
     temp=re.split(r"[, ()\n]+",x)
     command = temp[0].strip()
-    # print(temp)
 
     #Ignoring empty lines in the program 
     if temp==['']: 
@@ -157,7 +149,6 @@ for x in data:
             else:
                 imm=bin(int(temp[2]))
 
-        # print(imm[0],imm[len(imm)-10-1:len(imm)-1],imm[len(imm)-1-11],imm[len(imm)-20:len(imm)-12],reg,opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[0]}{imm[len(imm)-10-1:len(imm)-1]}{imm[len(imm)-1-11]}{imm[len(imm)-20:len(imm)-12]}{reg}{opcode}\n"
             file.writelines(f)
@@ -177,7 +168,6 @@ for x in data:
             imm=bin(int(temp[2]))
 
         s1 = getregisters(temp[3].strip())["address"]
-        # print(imm[len(imm)-1-11:len(imm)-5],dest,s1,funct3,imm[len(imm)-1-4:len(imm)],opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[len(imm)-1-11:len(imm)-5]}{dest}{s1}{funct3}{imm[len(imm)-1-4:len(imm)]}{opcode}\n"
             file.writelines(f)
@@ -195,7 +185,6 @@ for x in data:
         else:
             imm=bin(int(temp[2]))
 
-        # print(imm[0:len(imm)-12],dest,opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
             file.writelines(f)
@@ -226,7 +215,6 @@ for x in data:
             s2 = getregisters(temp[2].strip())['address']
 
         funct3 = itype['funct3'][command]
-        # print(imm,s2,funct3,s1,opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm}{s2}{funct3}{s1}{opcode}\n"
             file.writelines(f)
@@ -248,7 +236,6 @@ for x in data:
         s1 = getregisters(temp[1].strip())['address']
         s2 = getregisters(temp[2].strip())['address']
         funct3 = btype['funct3'][command]
-        # print(imm[len(imm)-1-12],imm[len(imm)-10-1:len(imm)-5],s2,s1,funct3,imm[len(imm)-5:len(imm)-1],imm[len(imm)-11-1],opcode)
         with open("output.txt", 'a') as file:
             f = f"{imm[len(imm)-1-12]}{imm[len(imm)-10-1:len(imm)-5]}{s2}{s1}{funct3}{imm[len(imm)-5:len(imm)-1]}{imm[len(imm)-11-1]}{opcode}\n"
             file.writelines(f)
@@ -258,7 +245,7 @@ for x in data:
     elif command == "halt":
         line_count += 1
         PC+=4
-        exit("Halted")
+        exit("Program has been Halted")
     
 
     elif command == "rvrs":
@@ -267,7 +254,7 @@ for x in data:
         rd = getregisters(temp[1].strip())
         rd["value"] = (rs["value"])[::-1]
         with open("output.txt", 'a') as file:
-            f = f"0000000{rd['address']}000{rs['address']}000000000000\n"
+            f = f"000000000000{rs['address']}000{rd['address']}1100000\n"
             file.writelines(f)
         PC+=4
 
@@ -290,9 +277,8 @@ for x in data:
         except:
             dest["value"] = "0"*32            
         with open("output.txt", 'a') as file:
-            f = f"0000000{dest['address']}000{s1['address']}{s2['address']}0000000\n"
+            f = f"0000000{s2['address']}{s1['address']}000{dest['address']}0000100\n"
             file.writelines(f)
         PC+=4
     else:
         exit(f"Instructions Not Found At Line No. {line_count+1}")
-# print(PC)    

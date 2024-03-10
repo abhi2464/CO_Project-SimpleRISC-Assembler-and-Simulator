@@ -7,4 +7,6 @@ start: lui t0,100
     jal gp,-512
     jalr t4,t0,0
     jal a6,end
+    mul t1,t2,t3
+    rvrs t1,t2
 end: beq zero,zero,0
