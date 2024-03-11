@@ -77,7 +77,16 @@ def getregisters(reg):
     try:
         return registers[reg]
     except:
+        removeline()
         exit(f"Register Not Found At Line No. {line_count}")
+
+def removeline():
+    with open('output.txt', 'r') as file:
+        data = file.readlines()
+
+    data[len(data)-1] = data[len(data)-1].replace('\n','')
+    with open('output.txt', 'w') as file:
+        file.writelines(data)    
 
 
 with open('input.txt', 'r') as file:
@@ -243,6 +252,7 @@ for x in data:
 
     # Bonus Part
     elif command == "halt":
+        removeline()
         line_count += 1
         PC+=4
         exit("Program has been Halted")
@@ -281,4 +291,7 @@ for x in data:
             file.writelines(f)
         PC+=4
     else:
+        removeline()
         exit(f"Instructions Not Found At Line No. {line_count+1}")
+
+removeline()
