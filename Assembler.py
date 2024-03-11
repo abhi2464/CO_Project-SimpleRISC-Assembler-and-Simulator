@@ -1,4 +1,7 @@
 import re
+import sys
+file_input=sys.argv[1]
+file_output=sys.argv[2]
 rtype = {
     'opcode':'0110011',
     'funct3':{'add':'000','sub':'000', 'sll':'001', 'slt':'010', 'sltu':'011', 'xor':'100', 'srl':'101','or':'110','and':'111'},
@@ -81,18 +84,18 @@ def getregisters(reg):
         exit(f"Register Not Found At Line No. {line_count}")
 
 def removeline():
-    with open('output.txt', 'r') as file:
+    with open(file_output, 'r') as file:
         data = file.readlines()
 
     data[len(data)-1] = data[len(data)-1].replace('\n','')
-    with open('output.txt', 'w') as file:
+    with open(file_output, 'w') as file:
         file.writelines(data)    
 
 
-with open('input.txt', 'r') as file:
+with open(file_input, 'r') as file:
     data = file.readlines()
 
-with open("output.txt", 'w') as file:
+with open(file_output, 'w') as file:
     file.writelines("")
 
 for j in range(len(data)):
@@ -139,7 +142,7 @@ for x in data:
         opcode = rtype['opcode']
         funct3 = rtype['funct3'][command]
         funct7 = rtype['funct7'][command]
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{funct7}{s2}{s1}{funct3}{dest}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -158,7 +161,7 @@ for x in data:
             else:
                 imm=bin(int(temp[2]))
 
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{imm[0]}{imm[len(imm)-10-1:len(imm)-1]}{imm[len(imm)-1-11]}{imm[len(imm)-20:len(imm)-12]}{reg}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -177,7 +180,7 @@ for x in data:
             imm=bin(int(temp[2]))
 
         s1 = getregisters(temp[3].strip())["address"]
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{imm[len(imm)-1-11:len(imm)-5]}{dest}{s1}{funct3}{imm[len(imm)-1-4:len(imm)]}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -194,7 +197,7 @@ for x in data:
         else:
             imm=bin(int(temp[2]))
 
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{imm[0:len(imm)-12]}{dest}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -224,7 +227,7 @@ for x in data:
             s2 = getregisters(temp[2].strip())['address']
 
         funct3 = itype['funct3'][command]
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{imm}{s2}{funct3}{s1}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -245,7 +248,7 @@ for x in data:
         s1 = getregisters(temp[1].strip())['address']
         s2 = getregisters(temp[2].strip())['address']
         funct3 = btype['funct3'][command]
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"{imm[len(imm)-1-12]}{imm[len(imm)-10-1:len(imm)-5]}{s2}{s1}{funct3}{imm[len(imm)-5:len(imm)-1]}{imm[len(imm)-11-1]}{opcode}\n"
             file.writelines(f)
         PC+=4
@@ -263,7 +266,7 @@ for x in data:
         rs = getregisters(temp[2].strip())   
         rd = getregisters(temp[1].strip())
         rd["value"] = (rs["value"])[::-1]
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"000000000000{rs['address']}000{rd['address']}1100000\n"
             file.writelines(f)
         PC+=4
@@ -286,7 +289,7 @@ for x in data:
             dest["value"] = result
         except:
             dest["value"] = "0"*32            
-        with open("output.txt", 'a') as file:
+        with open(file_output, 'a') as file:
             f = f"0000000{s2['address']}{s1['address']}000{dest['address']}0000100\n"
             file.writelines(f)
         PC+=4
