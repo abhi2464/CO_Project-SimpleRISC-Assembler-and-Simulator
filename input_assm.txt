@@ -1,0 +1,2 @@
+add t0,ra,sp
+beq zero,zero,0

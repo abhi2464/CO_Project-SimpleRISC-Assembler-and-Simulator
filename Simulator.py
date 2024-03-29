@@ -1,7 +1,7 @@
 register_add={
     "00000":"00000000000000000000000000000000",
-    "00001":"00000000000000000000000000000000",
-    "00010":"00000000000000000000000000000000",
+    "00001":"00000000000000000000000000000010",
+    "00010":"00000000000000000000000000000011",
     "00011":"00000000000000000000000000000000",
     "00100":"00000000000000000000000000000000",
     "00101":"00000000000000000000000000000000",
@@ -32,41 +32,6 @@ register_add={
     "11110":"00000000000000000000000000000000",
     "11111":"00000000000000000000000000000000"
 }
-# registers = {
-#     "zero": {"address": "00000", "value": ""},
-#     "ra": {"address": "00001", "value": ""},
-#     "sp": {"address": "00010", "value": ""},
-#     "gp": {"address": "00011", "value": ""},
-#     "tp": {"address": "00100", "value": ""},
-#     "t0": {"address": "00101", "value": ""},
-#     "t1": {"address": "00110", "value": ""},
-#     "t2": {"address": "00111", "value": ""},
-#     "s0": {"address": "01000", "value": ""},
-#     "fp": {"address": "01000", "value": ""},
-#     "s1": {"address": "01001", "value": ""},
-#     "a0": {"address": "01010", "value": ""},
-#     "a1": {"address": "01011", "value": ""},
-#     "a2": {"address": "01100", "value": ""},
-#     "a3": {"address": "01101", "value": ""},
-#     "a4": {"address": "01110", "value": ""},
-#     "a5": {"address": "01111", "value": ""},
-#     "a6": {"address": "10000", "value": ""},
-#     "a7": {"address": "10001", "value": ""},
-#     "s2": {"address": "10010", "value": ""},
-#     "s3": {"address": "10011", "value": ""},
-#     "s4": {"address": "10100", "value": ""},
-#     "s5": {"address": "10101", "value": ""},
-#     "s6": {"address": "10110", "value": ""},
-#     "s7": {"address": "10111", "value": ""},
-#     "s8": {"address": "11000", "value": ""},
-#     "s9": {"address": "11001", "value": ""},
-#     "s10": {"address": "11010", "value": ""},
-#     "s11": {"address": "11011", "value": ""},
-#     "t3": {"address": "11100", "value": ""},
-#     "t4": {"address": "11101", "value": ""},
-#     "t5": {"address": "11110", "value": ""},
-#     "t6": {"address": "11111", "value": ""},
-# }
 
 with open("input.txt", 'r') as file:
     data = file.readlines()
@@ -80,13 +45,68 @@ for j in range(len(data)):
     else:
         data[j]=data[j].strip()
 
+#To Convert a Binary number to decimal
+def deci(x, bits):
+    assert len(x) <= bits
+    n = int(x, 2)
+    s = 1 << (bits - 1)
+    return (n & s - 1) - (n & s)
+
 PC=-4 #Program Counter
-bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(21)] ) )
 def r_type(x):
-    func=x[17:len(x)-12]
+    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+    func=x[17:20]
+    rd=x[20:25]
+    rs1=x[12:17]
+    rs2=x[7:12]
     if func=="000":
-        pass
+        #add
+        ans=deci(register_add[rs1],32)+deci(register_add[rs2],32)
+        register_add[rd]=bini(ans)
+
+    elif  func=="000" and x[0:7]=="0100000":
+        #sub
+        ans=deci(register_add[rs1],32)-deci(register_add[rs2],32)
+        register_add[rd]=bini(ans)
+
+    elif func=="001":
+        #sll
+        ans=deci(register_add(rs1),32)<<int(register_add[rs2][27:32],2)
+        register_add[rd]=bini(ans)
+
+    elif func=="010":
+        #slt
+        if deci(register_add(rs1),32)<deci(register_add(rs2),32):
+            register_add[rd]=bini(1)
+
+    elif func=="011":
+        #sltu
+        if int(register_add(rs1),2)<int(register_add(rs2),2):
+            register_add[rd]=bini(1)
+    
+    elif func=="100":
+        #xor
+        ans=deci(register_add[rs1],32)^deci(register_add[rs2],32)
+        register_add[rd]=bini(ans)
+
+    elif func=="101":
+        #srl
+        ans=deci(register_add(rs1),32)>>int(register_add[rs2][27:32],2)
+        register_add[rd]=bini(ans)
+
+    elif func=="110":
+        #or
+        ans=deci(register_add[rs1],32)|deci(register_add[rs2],32)
+        register_add[rd]=bini(ans)
+    
+    elif func=="111":
+        #and
+        ans=deci(register_add[rs1],32)&deci(register_add[rs2],32)
+        register_add[rd]=bini(ans)
+
 # print(data)
 for x in data:
     if x[25:len(x)]=="0110011":
+        PC+=4
         r_type(x)
+print (register_add)
