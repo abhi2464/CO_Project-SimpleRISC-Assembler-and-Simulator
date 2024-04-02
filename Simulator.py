@@ -106,17 +106,17 @@ def r_type(x):
 
     elif func=="001":
         #sll
-        ans=deci(register_add(rs1),32)<<int(register_add[rs2][27:32],2)
+        ans=deci(register_add[rs1],32)<<int(register_add[rs2][27:32],2)
         register_add[rd]=bini(ans)
 
     elif func=="010":
         #slt
-        if deci(register_add(rs1),32)<deci(register_add(rs2),32):
+        if deci(register_add[rs1],32)<deci(register_add(rs2),32):
             register_add[rd]=bini(1)
 
     elif func=="011":
         #sltu
-        if int(register_add(rs1),2)<int(register_add(rs2),2):
+        if int(register_add[rs1],2)<int(register_add(rs2),2):
             register_add[rd]=bini(1)
     
     elif func=="100":
@@ -126,7 +126,7 @@ def r_type(x):
 
     elif func=="101":
         #srl
-        ans=deci(register_add(rs1),32)>>int(register_add[rs2][27:32],2)
+        ans=deci(register_add[rs1],32)>>int(register_add[rs2][27:32],2)
         register_add[rd]=bini(ans)
 
     elif func=="110":
@@ -149,15 +149,19 @@ for x in data:
         PC+=4
         break
 with open("output.txt", 'a') as file:
+    a=":"
+    c="000"
+    d=str("0b")
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
-    file.write(bini(PC))
+    file.write(d+bini(PC))
     file.write(" ")
     for i in register_add:
-        file.write(register_add[i])
+        file.write(d+register_add[i])
         file.write(" ")
     file.write("\n")
     
     for j in data_mem:
-        file.write(data_mem[j])
-        file.write("\n")
+        b=hex(int(j))
+        f=f"{b[0:2]}{c}{b[2:]}{a}{d+data_mem[j]}\n"
+        file.writelines(f)
 print (register_add)

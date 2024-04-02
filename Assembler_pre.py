@@ -103,7 +103,7 @@ for i in range(len(data)):
         for k in data[i]:
             if k==':':
                 label[data[i][0:data[i].index(':')]]=label_add
-                data[i]=data[i][data[i].index(':')+2:]
+                data[i]=data[i][data[i].index(':')+1:]
             else:
                 data[i]=data[i].strip() #to remove extra spaces from the instructions
 # print(label)

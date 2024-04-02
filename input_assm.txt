@@ -1,2 +1,8 @@
-add t0,ra,sp
+add s1,zero,zero
+add s2,zero,zero
+
+sll s1,s1,s2
+
+
+and s2,s2,s3
 beq zero,zero,0
