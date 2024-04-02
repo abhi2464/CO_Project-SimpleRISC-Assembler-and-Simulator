@@ -1,12 +1,12 @@
 register_add={
     "00000":"00000000000000000000000000000000",
-    "00001":"00000000000000000000000000000010",
-    "00010":"11111111111111111111111111111101",
+    "00001":"00000000000000000000000000000000",
+    "00010":"00000000000000000000000100000000",
     "00011":"00000000000000000000000000000000",
     "00100":"00000000000000000000000000000000",
     "00101":"00000000000000000000000000000000",
-    "00110":"00000000000000000000000000000000",
-    "00111":"00000000000000000000000000000000",
+    "00110":"00000000000000000000000000000010",
+    "00111":"00000000000000000000000000000011",
     "01000":"00000000000000000000000000000000",
     "01001":"00000000000000000000000000000000",
     "01010":"00000000000000000000000000000000",
@@ -80,6 +80,19 @@ for j in range(len(data)):
     else:
         data[j]=data[j].strip()
 
+#Writing in Ouput File
+def op_write():
+    global PC
+    with open("output.txt", 'a') as file:
+        d=str("0b")
+        bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+        file.write(d+bini(PC))
+        file.write(" ")
+        for i in register_add:
+            file.write(d+register_add[i])
+            file.write(" ")
+        file.write("\n")
+    
 #To Convert a Binary number to decimal
 def deci(x, bits):
     assert len(x) <= bits
@@ -87,8 +100,9 @@ def deci(x, bits):
     s = 1 << (bits - 1)
     return (n & s - 1) - (n & s)
 
-PC=-4 #Program Counter
+PC=0 #Program Counter
 def r_type(x):
+    global PC
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
     func=x[17:20]
     rd=x[20:25]
@@ -96,72 +110,84 @@ def r_type(x):
     rs2=x[7:12]
     if func=="000":
         #add
+        PC+=4
         ans=deci(register_add[rs1],32)+deci(register_add[rs2],32)
         register_add[rd]=bini(ans)
+        op_write()
 
     elif  func=="000" and x[0:7]=="0100000":
         #sub
+        PC+=4
         ans=deci(register_add[rs1],32)-deci(register_add[rs2],32)
         register_add[rd]=bini(ans)
+        op_write()
 
     elif func=="001":
         #sll
+        PC+=4
         ans=deci(register_add[rs1],32)<<int(register_add[rs2][27:32],2)
         register_add[rd]=bini(ans)
+        op_write()
 
     elif func=="010":
         #slt
         if deci(register_add[rs1],32)<deci(register_add(rs2),32):
+            PC+=4
             register_add[rd]=bini(1)
+            op_write()
 
     elif func=="011":
         #sltu
         if int(register_add[rs1],2)<int(register_add(rs2),2):
+            PC+=4
             register_add[rd]=bini(1)
+            op_write()
     
     elif func=="100":
         #xor
+        PC+=4
         ans=deci(register_add[rs1],32)^deci(register_add[rs2],32)
         register_add[rd]=bini(ans)
+        op_write()
 
     elif func=="101":
         #srl
+        PC+=4
         ans=deci(register_add[rs1],32)>>int(register_add[rs2][27:32],2)
         register_add[rd]=bini(ans)
+        op_write()
 
     elif func=="110":
         #or
+        PC+=4
         ans=deci(register_add[rs1],32)|deci(register_add[rs2],32)
         register_add[rd]=bini(ans)
+        op_write()
     
     elif func=="111":
         #and
+        PC+=4
         ans=deci(register_add[rs1],32)&deci(register_add[rs2],32)
         register_add[rd]=bini(ans)
+        op_write()
 
 # print(data)
 for x in data:
     if x[25:len(x)]=="0110011":
-        PC+=4
         r_type(x)
     
     elif x=="00000000000000000000000001100011":
         PC+=4
+        op_write()
         break
+
 with open("output.txt", 'a') as file:
-    a=":"
+    a=str(":")
     c="000"
     d=str("0b")
-    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
-    file.write(d+bini(PC))
-    file.write(" ")
-    for i in register_add:
-        file.write(d+register_add[i])
-        file.write(" ")
-    file.write("\n")
-    
     for j in data_mem:
         b=hex(int(j))
         f=f"{b[0:2]}{c}{b[2:]}{a}{d+data_mem[j]}\n"
         file.writelines(f)
-print (register_add)
+
+# print (register_add)
