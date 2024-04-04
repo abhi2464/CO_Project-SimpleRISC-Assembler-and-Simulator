@@ -149,7 +149,7 @@ for x in data:
         reg=getregisters(temp[1].strip())["address"]
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(21)] ) )
         if temp[2] in label:
-            imm=bin(PC+4-label[temp[2]])
+            imm=bin(label[temp[2]]-(PC+4))
         else:
             if int(temp[2])<(-2**21) or int(temp[2])>((2**21)-1):
                 exit(f"Invalid Immediate Value At Line No. {line_count}")
@@ -237,7 +237,7 @@ for x in data:
         opcode=btype['opcode']
         bin = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(16)] ) )
         if temp[3] in label:
-            imm=bin(PC+4-label[temp[3]])
+            imm=bin(label[temp[3]]-(PC+4))
         else:
             if int(temp[3])<(-2**16) or int(temp[3])>((2**16)-1):
                 exit(f"Invalid Immediate Value At Line No. {line_count}")
