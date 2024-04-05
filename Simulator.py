@@ -80,9 +80,12 @@ for j in range(len(data)):
     else:
         data[j]=data[j].strip()
 
+ins_length=len(data) #Total No. Instructions
+
 #Writing in Ouput File
 def op_write():
     global PC
+    global register_add
     with open("output.txt", 'a') as file:
         d=str("0b")
         bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
@@ -92,6 +95,19 @@ def op_write():
             file.write(d+register_add[i])
             file.write(" ")
         file.write("\n")
+
+#Writing the Data Memory
+def memo_write():
+    global data_mem
+    with open("output.txt", 'a') as file:
+        a=str(":")
+        c="000"
+        d=str("0b")
+        for j in data_mem:
+            b=hex(int(j))
+            f=f"{b[0:2]}{c}{b[2:]}{a}{d+data_mem[j]}\n"
+            file.writelines(f)
+    exit()
     
 #To Convert a Binary number to decimal
 def deci(x, bits):
@@ -101,6 +117,8 @@ def deci(x, bits):
     return (n & s - 1) - (n & s)
 
 PC=0 #Program Counter
+
+#R-Type
 def r_type(x):
     global PC
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
@@ -171,23 +189,33 @@ def r_type(x):
         register_add[rd]=bini(ans)
         op_write()
 
+#J-Type
+def j_type(x):
+    global PC
+    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+    rd=x[20:25]
+    imm=x[0]+x[12:20]+x[11]+x[1:11]+"0"
+    imm_dec=deci(imm,len(imm))
+    register_add[rd]=bini(PC+4)
+    PC=PC+imm_dec
+    execute(PC//4)
+
 # print(data)
-for x in data:
-    if x[25:len(x)]=="0110011":
-        r_type(x)
-    
-    elif x=="00000000000000000000000001100011":
-        PC+=4
-        op_write()
-        break
+def execute(start):
+    global PC
+    # global ins_length
+    for x in range(start,ins_length):
+        if data[x][25:len(data[x])]=="0110011": #R-Type
+            r_type(data[x])
+        
 
-with open("output.txt", 'a') as file:
-    a=str(":")
-    c="000"
-    d=str("0b")
-    for j in data_mem:
-        b=hex(int(j))
-        f=f"{b[0:2]}{c}{b[2:]}{a}{d+data_mem[j]}\n"
-        file.writelines(f)
+        elif data[x][25:len(data[x])]=="1101111": #J-Type
+            j_type(data[x])
+        elif data[x]=="00000000000000000000000001100011":
+            PC+=4
+            op_write()
+            memo_write()
 
+
+execute(0)
 # print (register_add)
