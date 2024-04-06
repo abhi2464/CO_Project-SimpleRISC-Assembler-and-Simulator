@@ -251,7 +251,6 @@ def execute(start):
             j_type(data[x])
 
         elif data[x][25:len(data[x])]=="1100011": #B-Type
-            print("hello")
             b_type(data[x])
         
 
