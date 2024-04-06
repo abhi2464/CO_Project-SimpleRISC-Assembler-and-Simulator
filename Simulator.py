@@ -1,11 +1,11 @@
-register_add={
+register_val={
     "00000":"00000000000000000000000000000000",
     "00001":"00000000000000000000000000000000",
     "00010":"00000000000000000000000100000000",
     "00011":"00000000000000000000000000000000",
     "00100":"00000000000000000000000000000000",
-    "00101":"00000000000000000000000000000000",
-    "00110":"00000000000000000000000000000010",
+    "00101":"11111111111111111111111111111111",
+    "00110":"00000000000000000000000000000011",
     "00111":"00000000000000000000000000000011",
     "01000":"00000000000000000000000000000000",
     "01001":"00000000000000000000000000000000",
@@ -85,14 +85,14 @@ ins_length=len(data) #Total No. Instructions
 #Writing in Ouput File
 def op_write():
     global PC
-    global register_add
+    global register_val
     with open("output.txt", 'a') as file:
         d=str("0b")
         bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
         file.write(d+bini(PC))
         file.write(" ")
-        for i in register_add:
-            file.write(d+register_add[i])
+        for i in register_val:
+            file.write(d+register_val[i])
             file.write(" ")
         file.write("\n")
 
@@ -129,64 +129,64 @@ def r_type(x):
     if func=="000":
         #add
         PC+=4
-        ans=deci(register_add[rs1],32)+deci(register_add[rs2],32)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)+deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
         op_write()
 
     elif  func=="000" and x[0:7]=="0100000":
         #sub
         PC+=4
-        ans=deci(register_add[rs1],32)-deci(register_add[rs2],32)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)-deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
         op_write()
 
     elif func=="001":
         #sll
         PC+=4
-        ans=deci(register_add[rs1],32)<<int(register_add[rs2][27:32],2)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)<<int(register_val[rs2][27:32],2)
+        register_val[rd]=bini(ans)
         op_write()
 
     elif func=="010":
         #slt
-        if deci(register_add[rs1],32)<deci(register_add(rs2),32):
+        if deci(register_val[rs1],32)<deci(register_val(rs2),32):
             PC+=4
-            register_add[rd]=bini(1)
+            register_val[rd]=bini(1)
             op_write()
 
     elif func=="011":
         #sltu
-        if int(register_add[rs1],2)<int(register_add(rs2),2):
+        if int(register_val[rs1],2)<int(register_val(rs2),2):
             PC+=4
-            register_add[rd]=bini(1)
+            register_val[rd]=bini(1)
             op_write()
     
     elif func=="100":
         #xor
         PC+=4
-        ans=deci(register_add[rs1],32)^deci(register_add[rs2],32)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)^deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
         op_write()
 
     elif func=="101":
         #srl
         PC+=4
-        ans=deci(register_add[rs1],32)>>int(register_add[rs2][27:32],2)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)>>int(register_val[rs2][27:32],2)
+        register_val[rd]=bini(ans)
         op_write()
 
     elif func=="110":
         #or
         PC+=4
-        ans=deci(register_add[rs1],32)|deci(register_add[rs2],32)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)|deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
         op_write()
     
     elif func=="111":
         #and
         PC+=4
-        ans=deci(register_add[rs1],32)&deci(register_add[rs2],32)
-        register_add[rd]=bini(ans)
+        ans=deci(register_val[rs1],32)&deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
         op_write()
 
 #J-Type
@@ -196,26 +196,65 @@ def j_type(x):
     rd=x[20:25]
     imm=x[0]+x[12:20]+x[11]+x[1:11]+"0"
     imm_dec=deci(imm,len(imm))
-    register_add[rd]=bini(PC+4)
+    register_val[rd]=bini(PC+4)
     PC=PC+imm_dec
     execute(PC//4)
+
+def b_type(x):
+    global PC
+    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+    func=x[17:20]
+    rs1=x[12:17]
+    rs2=x[7:12]
+    imm=x[0]+x[24]+x[1:7]+x[20:24]+"0"
+    imm_dec=deci(imm,len(imm))
+
+    if func=="000" and deci(register_val[rs1],32)==deci(register_val[rs2],32): #beq
+        PC=PC+imm_dec
+        execute(PC//4)
+
+    elif func=="001" and deci(register_val[rs1],32)!=deci(register_val[rs2],32): #bne
+        PC=PC+imm_dec
+        execute(PC//4)
+
+    elif func=="100" and deci(register_val[rs1],32)<deci(register_val[rs2],32): #blt
+        PC=PC+imm_dec
+        execute(PC//4)
+
+    elif func=="101" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #bge
+        PC=PC+imm_dec
+        execute(PC//4)
+
+    elif func=="110" and int(register_val[rs1],2)<int(register_val[rs2],2): #bltu
+        PC=PC+imm_dec
+        execute(PC//4)
+
+    elif func=="111" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #begu
+        PC=PC+imm_dec
+        execute(PC//4)
 
 # print(data)
 def execute(start):
     global PC
     # global ins_length
     for x in range(start,ins_length):
-        if data[x][25:len(data[x])]=="0110011": #R-Type
-            r_type(data[x])
-        
 
-        elif data[x][25:len(data[x])]=="1101111": #J-Type
-            j_type(data[x])
-        elif data[x]=="00000000000000000000000001100011":
+        if data[x]=="00000000000000000000000001100011": #Virtual Halt
             PC+=4
             op_write()
             memo_write()
+        
+        elif data[x][25:len(data[x])]=="0110011": #R-Type
+            r_type(data[x])
+        
+        elif data[x][25:len(data[x])]=="1101111": #J-Type
+            j_type(data[x])
+
+        elif data[x][25:len(data[x])]=="1100011": #B-Type
+            print("hello")
+            b_type(data[x])
+        
 
 
 execute(0)
-# print (register_add)
+# print (register_val)

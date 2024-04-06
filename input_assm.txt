@@ -1,5 +1,10 @@
-add s0,zero,zero
-add s2,zero,zero
-jal ra,fibo_func
-fibo_func:add s2,s0,s1
+add s0,t1,zero
+add s1,t2,zero
+add a0,t0,zero
+jal ra,mul
+beq zero,zero,0
+
+mul:add t6,t6,s0
+sub s1,s1,a0
+bne s1,zero,mul
 beq zero,zero,0
