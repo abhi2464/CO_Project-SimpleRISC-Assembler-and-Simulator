@@ -233,6 +233,20 @@ def b_type(x):
         PC=PC+imm_dec
         execute(PC//4)
 
+
+def u_type(x,opcode):
+    rd = x[20:25]
+    print(PC)    
+    if opcode == '0010111':
+        imm = bin((int(x[0:20],2) << 12) + PC)
+        register_val[rd] = imm
+        op_write()
+    elif opcode == '0110111':
+        imm = bin((int(x[0:20],2) << 12))
+        register_val[rd] = imm
+        op_write()
+
+
 # print(data)
 def execute(start):
     global PC
@@ -252,6 +266,13 @@ def execute(start):
 
         elif data[x][25:len(data[x])]=="1100011": #B-Type
             b_type(data[x])
+
+        elif data[x][25:len(data[x])]=="0110111": #U-Type
+            u_type(data[x],'0110111')
+        
+        elif data[x][25:len(data[x])]=="0010111": #U-Type
+            u_type(data[x],'0010111')
+            
         
 
 
