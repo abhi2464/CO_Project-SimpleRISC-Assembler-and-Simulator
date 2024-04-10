@@ -1,10 +1,13 @@
-add s0,t1,zero
-add s1,t2,zero
-add a0,t0,zero
-jal ra,mul
+add s0,zero,zero
+addi s1,zero,1
+add s2,zero,zero
+addi s3,zero,6
+loop_again:jal ra,fibo_func
+add s0,s1,zero
+add s1,s2,zero
+addi s3,s3,-1
+bne s3,zero,loop_again
 beq zero,zero,0
-
-mul:add t6,t6,s0
-sub s1,s1,a0
-bne s1,zero,mul
+fibo_func:add s2,s0,s1
+jalr t0,ra,0
 beq zero,zero,0

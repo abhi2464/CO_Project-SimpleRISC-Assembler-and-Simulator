@@ -198,6 +198,10 @@ def j_type(x):
     imm_dec=deci(imm,len(imm))
     register_val[rd]=bini(PC+4)
     PC=PC+imm_dec
+    # print(PC)
+    PC=deci(bini(PC)[0:-1]+"0",32)
+    # print(PC,"next")
+    op_write()
     execute(PC//4)
 
 def b_type(x):
@@ -211,31 +215,38 @@ def b_type(x):
 
     if func=="000" and deci(register_val[rs1],32)==deci(register_val[rs2],32): #beq
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
     elif func=="001" and deci(register_val[rs1],32)!=deci(register_val[rs2],32): #bne
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
     elif func=="100" and deci(register_val[rs1],32)<deci(register_val[rs2],32): #blt
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
     elif func=="101" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #bge
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
     elif func=="110" and int(register_val[rs1],2)<int(register_val[rs2],2): #bltu
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
     elif func=="111" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #begu
         PC=PC+imm_dec
+        op_write()
         execute(PC//4)
 
 
 def u_type(x,opcode):
     rd = x[20:25]
+    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
     # print(PC)    
     if opcode == '0010111':
         imm = bin((int(x[0:20],2) << 12) + PC)
@@ -256,24 +267,30 @@ def i_type(x , opcode):
     rs1=x[12:17]
     imm=x[0:12]
     imm_dec = deci(imm,len(imm))
-    rs1_dec=deci(rs1,len(rs1))
+    rs1_dec=deci(register_val[rs1],32)
+
     if func=="010": # lw
         PC+=4
         temp = imm_dec + rs1_dec
         register_val[rd] = data_mem[temp]
         op_write()
-    elif func == "000"  and opcode=="0010011":
+
+    elif func == "000"  and opcode=="0010011": #addi
         PC+=4
         register_val[rd] = bini(imm_dec + rs1_dec)
         op_write()
+
     elif func=="011": # sltiu
         if int(rs1 , 2) < int(imm , 2):
             PC+=4
             register_val[rd] = bini(1)
             op_write()
-    elif func=="000" and opcode=="1100111":
+
+    elif func=="000" and opcode=="1100111": #jalr
         register_val[rd]=bini(PC+4)
-        PC = rs1 + imm_dec
+        PC = rs1_dec + imm_dec
+        PC=deci(bini(PC)[0:-1]+"0",32)
+        op_write()
         execute(PC//4)
 
 # print(data)
