@@ -4,9 +4,9 @@ register_val={
     "00010":"00000000000000000000000100000000",
     "00011":"00000000000000000000000000000000",
     "00100":"00000000000000000000000000000000",
-    "00101":"11111111111111111111111111111111",
-    "00110":"00000000000000000000000000000011",
-    "00111":"00000000000000000000000000000011",
+    "00101":"00000000000000000000000000000000",
+    "00110":"00000000000000000000000000000000",
+    "00111":"00000000000000000000000000000000",
     "01000":"00000000000000000000000000000000",
     "01001":"00000000000000000000000000000000",
     "01010":"00000000000000000000000000000000",
@@ -126,17 +126,17 @@ def r_type(x):
     rd=x[20:25]
     rs1=x[12:17]
     rs2=x[7:12]
-    if func=="000":
-        #add
-        PC+=4
-        ans=deci(register_val[rs1],32)+deci(register_val[rs2],32)
-        register_val[rd]=bini(ans)
-        op_write()
-
-    elif  func=="000" and x[0:7]=="0100000":
+    if  func=="000" and x[0:7]=="0100000":
         #sub
         PC+=4
         ans=deci(register_val[rs1],32)-deci(register_val[rs2],32)
+        register_val[rd]=bini(ans)
+        op_write()
+
+    elif func=="000":
+        #add
+        PC+=4
+        ans=deci(register_val[rs1],32)+deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
         op_write()
 
@@ -236,7 +236,7 @@ def b_type(x):
 
 def u_type(x,opcode):
     rd = x[20:25]
-    print(PC)    
+    # print(PC)    
     if opcode == '0010111':
         imm = bin((int(x[0:20],2) << 12) + PC)
         register_val[rd] = imm
@@ -246,6 +246,35 @@ def u_type(x,opcode):
         register_val[rd] = imm
         op_write()
 
+
+# I-type
+def i_type(x , opcode):
+    global PC
+    bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
+    func=x[17:20]
+    rd=x[20:25]
+    rs1=x[12:17]
+    imm=x[0:12]
+    imm_dec = deci(imm,len(imm))
+    rs1_dec=deci(rs1,len(rs1))
+    if func=="010": # lw
+        PC+=4
+        temp = imm_dec + rs1_dec
+        register_val[rd] = data_mem[temp]
+        op_write()
+    elif func == "000"  and opcode=="0010011":
+        PC+=4
+        register_val[rd] = bini(imm_dec + rs1_dec)
+        op_write()
+    elif func=="011": # sltiu
+        if int(rs1 , 2) < int(imm , 2):
+            PC+=4
+            register_val[rd] = bini(1)
+            op_write()
+    elif func=="000" and opcode=="1100111":
+        register_val[rd]=bini(PC+4)
+        PC = rs1 + imm_dec
+        execute(PC//4)
 
 # print(data)
 def execute(start):
@@ -272,8 +301,15 @@ def execute(start):
         
         elif data[x][25:len(data[x])]=="0010111": #U-Type
             u_type(data[x],'0010111')
-            
-        
+
+        elif data[x][25:len(data[x])]=="0000011": #I-Type lw
+            i_type(data[x] , "0000011")
+
+        elif data[x][25:len(data[x])]=="0010011": #I-Type addi sltiu
+            i_type(data[x] , "0010011")
+
+        elif data[x][25:len(data[x])]=="1100111": #I-Type jalr
+            i_type(data[x] , "1100111")
 
 
 execute(0)
