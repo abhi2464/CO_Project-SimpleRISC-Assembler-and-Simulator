@@ -294,6 +294,29 @@ def i_type(x , opcode):
         execute(PC//4)
 
 # print(data)
+
+# S type
+def s_type(x,opcode):
+    global PC, register_val,data_mem
+    bini = lambda x: ''.join(reversed([str((x >> i) & 1) for i in range(32)]))
+    func = x[17:20]
+    imm = x[20:25]+x[0:7]
+    imm_val=int(imm,2)
+    if imm[0]=='1':
+        imm_val -=(1<<12)
+    rs1=int(x[12:17],2)
+    rs2 =int(x[7:12],2)
+
+
+    base_address =int(register_val[format(rs1,'05b')],2)
+    effective_address = base_address+imm_val
+
+    address_key = str(effective_address)
+    data_mem[address_key] = register_val[format(rs2, '05b')]
+    PC += 4
+    op_write()
+
+
 def execute(start):
     global PC
     # global ins_length
@@ -328,6 +351,8 @@ def execute(start):
         elif data[x][25:len(data[x])]=="1100111": #I-Type jalr
             i_type(data[x] , "1100111")
 
+        elif data[x][25:len(data[x])]=="0100011":   # S-Type
+            s_type(data[x],"0100011")
 
 execute(0)
 # print (register_val)
