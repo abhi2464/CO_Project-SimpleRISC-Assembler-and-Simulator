@@ -298,22 +298,24 @@ def i_type(x , opcode):
 # S type
 def s_type(x,opcode):
     global PC, register_val,data_mem
+    PC += 4
     bini = lambda x: ''.join(reversed([str((x >> i) & 1) for i in range(32)]))
     func = x[17:20]
     imm = x[20:25]+x[0:7]
-    imm_val=int(imm,2)
-    if imm[0]=='1':
-        imm_val -=(1<<12)
-    rs1=int(x[12:17],2)
-    rs2 =int(x[7:12],2)
+    imm_val=deci(imm,len(imm))
+
+    # if imm[0]=='1':
+    #     imm_val -=(1<<12)
+    rs1=x[12:17]
+    rs2 =x[7:12]
 
 
-    base_address =int(register_val[format(rs1,'05b')],2)
+    base_address =deci(register_val[rs1],len(register_val[rs1]))
     effective_address = base_address+imm_val
 
     address_key = str(effective_address)
-    data_mem[address_key] = register_val[format(rs2, '05b')]
-    PC += 4
+    data_mem[address_key] = register_val[rs2]
+    
     op_write()
 
 
