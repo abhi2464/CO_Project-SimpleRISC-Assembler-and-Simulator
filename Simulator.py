@@ -99,6 +99,7 @@ def op_write():
 #Writing the Data Memory
 def memo_write():
     global data_mem
+    op_write()
     with open("output.txt", 'a') as file:
         a=str(":")
         c="000"
@@ -149,17 +150,18 @@ def r_type(x):
 
     elif func=="010":
         #slt
-        if deci(register_val[rs1],32)<deci(register_val(rs2),32):
-            PC+=4
+        PC+=4
+        if deci(register_val[rs1],32)<deci(register_val[rs2],32):
             register_val[rd]=bini(1)
-            op_write()
+        op_write()
+
 
     elif func=="011":
         #sltu
-        if int(register_val[rs1],2)<int(register_val(rs2),2):
-            PC+=4
+        PC+=4
+        if int(register_val[rs1],2)<int(register_val[rs2],2):
             register_val[rd]=bini(1)
-            op_write()
+        op_write()
     
     elif func=="100":
         #xor
@@ -192,6 +194,7 @@ def r_type(x):
 #J-Type
 def j_type(x):
     global PC
+    # PC+=4
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
     rd=x[20:25]
     imm=x[0]+x[12:20]+x[11]+x[1:11]+"0"
@@ -206,6 +209,7 @@ def j_type(x):
 
 def b_type(x):
     global PC
+    # PC+=4
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
     func=x[17:20]
     rs1=x[12:17]
@@ -243,17 +247,22 @@ def b_type(x):
         op_write()
         execute(PC//4)
 
+    else:
+        PC+=4
+        op_write()
 
 def u_type(x,opcode):
+    global PC
     rd = x[20:25]
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
-    # print(PC)    
+    # print(PC)
+    PC+=4    
     if opcode == '0010111':
-        imm = bin((int(x[0:20],2) << 12) + PC)
+        imm = bini((deci(x[0:20],len(x[0:20])) << 12) + PC)
         register_val[rd] = imm
         op_write()
     elif opcode == '0110111':
-        imm = bin((int(x[0:20],2) << 12))
+        imm = bini((deci(x[0:20],len(x[0:20])) << 12))
         register_val[rd] = imm
         op_write()
 
@@ -266,17 +275,21 @@ def i_type(x , opcode):
     rd=x[20:25]
     rs1=x[12:17]
     imm=x[0:12]
+    # print(imm,"%")
+    # print(register_val[rs1])
     imm_dec = deci(imm,len(imm))
     rs1_dec=deci(register_val[rs1],32)
 
+    # print(rs1_dec,"$$$$$")
     if func=="010": # lw
         PC+=4
         temp = imm_dec + rs1_dec
-        register_val[rd] = data_mem[temp]
+        register_val[rd] = data_mem[str(temp)]
         op_write()
 
     elif func == "000"  and opcode=="0010011": #addi
         PC+=4
+        # print(imm_dec + rs1_dec)
         register_val[rd] = bini(imm_dec + rs1_dec)
         op_write()
 
@@ -297,11 +310,11 @@ def i_type(x , opcode):
 
 # S type
 def s_type(x,opcode):
-    global PC, register_val,data_mem
+    global PC
     PC += 4
     bini = lambda x: ''.join(reversed([str((x >> i) & 1) for i in range(32)]))
     func = x[17:20]
-    imm = x[20:25]+x[0:7]
+    imm = x[0:7]+x[20:25]
     imm_val=deci(imm,len(imm))
 
     # if imm[0]=='1':
@@ -309,10 +322,14 @@ def s_type(x,opcode):
     rs1=x[12:17]
     rs2 =x[7:12]
 
-
+    # print(register_val[rs1])
     base_address =deci(register_val[rs1],len(register_val[rs1]))
+    # print(base_address)
     effective_address = base_address+imm_val
-
+    # print(effective_address,"#")
+    if effective_address>65660:
+        effective_address=effective_address-65660-1
+    # print(effective_address)
     address_key = str(effective_address)
     data_mem[address_key] = register_val[rs2]
     
