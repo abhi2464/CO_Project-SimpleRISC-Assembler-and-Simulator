@@ -99,7 +99,7 @@ def op_write():
 #Writing the Data Memory
 def memo_write():
     global data_mem
-    op_write()
+    # op_write()
     with open("output.txt", 'a') as file:
         a=str(":")
         c="000"
@@ -250,6 +250,7 @@ def b_type(x):
     else:
         PC+=4
         op_write()
+        execute(PC//4)
 
 def u_type(x,opcode):
     global PC
@@ -342,7 +343,7 @@ def execute(start):
     for x in range(start,ins_length):
 
         if data[x]=="00000000000000000000000001100011": #Virtual Halt
-            PC+=4
+            # PC+=4
             op_write()
             memo_write()
         
