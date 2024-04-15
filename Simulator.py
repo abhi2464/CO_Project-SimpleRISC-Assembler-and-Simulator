@@ -257,12 +257,15 @@ def u_type(x,opcode):
     rd = x[20:25]
     bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
     # print(PC)
-    PC+=4    
+    PC+=4 
+       
     if opcode == '0010111':
-        imm = bini((deci(x[0:20],len(x[0:20])) << 12) + PC)
+        # print(deci(x[0:20],len(x[0:20])))
+        imm = bini((deci(x[0:20],len(x[0:20])) << 12) + (PC-4))
         register_val[rd] = imm
         op_write()
     elif opcode == '0110111':
+        # print(deci(x[0:20],len(x[0:20])),"#")
         imm = bini((deci(x[0:20],len(x[0:20])) << 12))
         register_val[rd] = imm
         op_write()
@@ -295,10 +298,11 @@ def i_type(x , opcode):
         op_write()
 
     elif func=="011": # sltiu
+        PC+=4
         if int(rs1 , 2) < int(imm , 2):
-            PC+=4
+            # PC+=4
             register_val[rd] = bini(1)
-            op_write()
+        op_write()
 
     elif func=="000" and opcode=="1100111": #jalr
         register_val[rd]=bini(PC+4)
@@ -318,19 +322,14 @@ def s_type(x,opcode):
     imm = x[0:7]+x[20:25]
     imm_val=deci(imm,len(imm))
 
-    # if imm[0]=='1':
-    #     imm_val -=(1<<12)
     rs1=x[12:17]
     rs2 =x[7:12]
 
-    # print(register_val[rs1])
+    
     base_address =deci(register_val[rs1],len(register_val[rs1]))
-    # print(base_address)
+    
     effective_address = base_address+imm_val
-    # print(effective_address,"#")
-    if effective_address>65660:
-        effective_address=effective_address-65660-1
-    # print(effective_address)
+    
     address_key = str(effective_address)
     data_mem[address_key] = register_val[rs2]
     
