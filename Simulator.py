@@ -151,7 +151,11 @@ def r_type(x):
     elif func=="010":
         #slt
         PC+=4
+        # print(deci(register_val[rs1],32))
+        # print(deci(register_val[rs2],32))
         if deci(register_val[rs1],32)<deci(register_val[rs2],32):
+            # print(deci(register_val[rd],32))
+            # register_val[rs2]=bini(deci(register_val[rs2],32)+1)
             register_val[rd]=bini(1)
         op_write()
 
@@ -218,31 +222,39 @@ def b_type(x):
     imm_dec=deci(imm,len(imm))
 
     if func=="000" and deci(register_val[rs1],32)==deci(register_val[rs2],32): #beq
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="001" and deci(register_val[rs1],32)!=deci(register_val[rs2],32): #bne
+        # print("Hello")
+        # PC+=4
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="100" and deci(register_val[rs1],32)<deci(register_val[rs2],32): #blt
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="101" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #bge
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="110" and int(register_val[rs1],2)<int(register_val[rs2],2): #bltu
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="111" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #begu
+        op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
