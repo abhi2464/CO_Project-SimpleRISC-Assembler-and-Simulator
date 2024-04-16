@@ -222,7 +222,7 @@ def b_type(x):
     imm_dec=deci(imm,len(imm))
 
     if func=="000" and deci(register_val[rs1],32)==deci(register_val[rs2],32): #beq
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
@@ -230,31 +230,31 @@ def b_type(x):
     elif func=="001" and deci(register_val[rs1],32)!=deci(register_val[rs2],32): #bne
         # print("Hello")
         # PC+=4
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="100" and deci(register_val[rs1],32)<deci(register_val[rs2],32): #blt
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="101" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #bge
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="110" and int(register_val[rs1],2)<int(register_val[rs2],2): #bltu
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
 
     elif func=="111" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #begu
-        op_write()
+        # op_write()
         PC=PC+imm_dec
         op_write()
         execute(PC//4)
