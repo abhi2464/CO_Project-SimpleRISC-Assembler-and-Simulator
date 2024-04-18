@@ -1,6 +1,3 @@
-import sys
-file_input=sys.argv[1]
-file_output=sys.argv[2]
 register_val={
     "00000":"00000000000000000000000000000000",
     "00001":"00000000000000000000000000000000",
@@ -71,10 +68,10 @@ data_mem={
     "65660":"00000000000000000000000000000000"
 }
 
-with open(file_input, 'r') as file:
+with open("input.txt", 'r') as file:
     data = file.readlines()
 
-with open(file_output, 'w') as file:
+with open("output.txt", 'w') as file:
     file.writelines("")
 
 for j in range(len(data)):
@@ -93,7 +90,7 @@ def rd_zero(rd):
 def op_write():
     global PC
     global register_val
-    with open(file_output, 'a') as file:
+    with open("output.txt", 'a') as file:
         d=str("0b")
         bini = lambda x : ''.join(reversed( [str((x >> i) & 1) for i in range(32)] ) )
         file.write(d+bini(PC))
@@ -107,7 +104,7 @@ def op_write():
 def memo_write():
     global data_mem
     # op_write()
-    with open(file_output, 'a') as file:
+    with open("output.txt", 'a') as file:
         a=str(":")
         c="000"
         d=str("0b")
