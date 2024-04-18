@@ -82,6 +82,10 @@ for j in range(len(data)):
 
 ins_length=len(data) #Total No. Instructions
 
+def rd_zero(rd):
+    if rd=="00000":
+        register_val[rd]="00000000000000000000000000000000"
+
 #Writing in Ouput File
 def op_write():
     global PC
@@ -132,6 +136,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)-deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
     elif func=="000":
@@ -139,6 +144,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)+deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
     elif func=="001":
@@ -146,6 +152,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)<<int(register_val[rs2][27:32],2)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
     elif func=="010":
@@ -157,6 +164,7 @@ def r_type(x):
             # print(deci(register_val[rd],32))
             # register_val[rs2]=bini(deci(register_val[rs2],32)+1)
             register_val[rd]=bini(1)
+            rd_zero(rd)
         op_write()
 
 
@@ -165,6 +173,7 @@ def r_type(x):
         PC+=4
         if int(register_val[rs1],2)<int(register_val[rs2],2):
             register_val[rd]=bini(1)
+            rd_zero(rd)
         op_write()
     
     elif func=="100":
@@ -172,6 +181,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)^deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
     elif func=="101":
@@ -179,6 +189,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)>>int(register_val[rs2][27:32],2)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
     elif func=="110":
@@ -186,6 +197,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)|deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
     
     elif func=="111":
@@ -193,6 +205,7 @@ def r_type(x):
         PC+=4
         ans=deci(register_val[rs1],32)&deci(register_val[rs2],32)
         register_val[rd]=bini(ans)
+        rd_zero(rd)
         op_write()
 
 #J-Type
@@ -204,6 +217,7 @@ def j_type(x):
     imm=x[0]+x[12:20]+x[11]+x[1:11]+"0"
     imm_dec=deci(imm,len(imm))
     register_val[rd]=bini(PC+4)
+    rd_zero(rd)
     PC=PC+imm_dec
     # print(PC)
     PC=deci(bini(PC)[0:-1]+"0",32)
@@ -253,7 +267,7 @@ def b_type(x):
         op_write()
         execute(PC//4)
 
-    elif func=="111" and deci(register_val[rs1],32)>=deci(register_val[rs2],32): #begu
+    elif func=="111" and int(register_val[rs1],2)>=int(register_val[rs2],2): #begu
         # op_write()
         PC=PC+imm_dec
         op_write()
@@ -275,11 +289,13 @@ def u_type(x,opcode):
         # print(deci(x[0:20],len(x[0:20])))
         imm = bini((deci(x[0:20],len(x[0:20])) << 12) + (PC-4))
         register_val[rd] = imm
+        rd_zero(rd)
         op_write()
     elif opcode == '0110111':
         # print(deci(x[0:20],len(x[0:20])),"#")
         imm = bini((deci(x[0:20],len(x[0:20])) << 12))
         register_val[rd] = imm
+        rd_zero(rd)
         op_write()
 
 
@@ -301,23 +317,27 @@ def i_type(x , opcode):
         PC+=4
         temp = imm_dec + rs1_dec
         register_val[rd] = data_mem[str(temp)]
+        rd_zero(rd)
         op_write()
 
     elif func == "000"  and opcode=="0010011": #addi
         PC+=4
         # print(imm_dec + rs1_dec)
         register_val[rd] = bini(imm_dec + rs1_dec)
+        rd_zero(rd)
         op_write()
 
     elif func=="011": # sltiu
         PC+=4
-        if int(rs1 , 2) < int(imm , 2):
+        if int(register_val[rs1] , 2) < int(imm , 2):
             # PC+=4
             register_val[rd] = bini(1)
+            rd_zero(rd)
         op_write()
 
     elif func=="000" and opcode=="1100111": #jalr
         register_val[rd]=bini(PC+4)
+        rd_zero(rd)
         PC = rs1_dec + imm_dec
         PC=deci(bini(PC)[0:-1]+"0",32)
         op_write()
